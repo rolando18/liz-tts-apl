@@ -2,4 +2,5 @@
 out/
 audio/
 resources/
+models/
 *.iml
