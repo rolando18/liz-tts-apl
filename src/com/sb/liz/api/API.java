@@ -6,6 +6,8 @@ import com.sb.liz.tts.*;
 import static spark.Spark.*;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 
 public class API {
@@ -28,6 +30,7 @@ public class API {
                             if(NLPUnit.isSuccess){
                                 String audioFileName = SpeechUnit.doTTS(paragraph);
                                 res.header("Content-Type", "application/json");
+                                res.header("Access-Control-Allow-Origin", "*");
                                 res.status(200);
 
                                 Gson gson = new Gson();
@@ -43,10 +46,23 @@ public class API {
                             return "Uh-oh! Looks like there may be something wrong with your text.";
                         }
             });
-            get("/audio",
+            get("/audio/:fileName",
                     (req, res) -> {
-                        System.out.println("Sending back requested file.");
-                        return "Audio wav";
+                        res.header("Access-Control-Allow-Origin", "*");
+                        try{
+                            String fileName = req.params(":fileName") + ".wav";
+                            File audio = new File("audio\\" + fileName);
+                            if(!audio.exists()) throw new FileNotFoundException();
+                            res.status(200);
+                            return "File found";
+                        }
+                        catch(FileNotFoundException ex){
+                            res.status(404);
+                            return "File not found.";
+                        }
+                        catch(Exception ex){
+                            return "An unexpected error occurred";
+                        }
             });
         });
 
