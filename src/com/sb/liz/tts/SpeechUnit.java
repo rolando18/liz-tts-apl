@@ -17,9 +17,10 @@ public class SpeechUnit {
         String fileName = null;
         voice = VoiceManager.getInstance().getVoice("kevin16");
         if(voice != null){
-            fileName = "audio\\liz_tts_" + new Timestamp(System.currentTimeMillis());
-            fileName = fileName.replaceAll(":","").replace(".","");
-            audioPlayer = new SingleFileAudioPlayer(fileName, Type.WAVE);
+            fileName = "liz_tts_" + new Timestamp(System.currentTimeMillis());
+            // replacing all special characters in Timestamp with _
+            fileName = fileName.replaceAll("[:\\-\\s]","_").replace(".","_");
+            audioPlayer = new SingleFileAudioPlayer("audio\\" + fileName, Type.WAVE);
             voice.allocate();
             voice.setAudioPlayer(audioPlayer);
             voice.setRate(160);

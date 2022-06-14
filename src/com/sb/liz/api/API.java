@@ -6,6 +6,8 @@ import com.sb.liz.tts.*;
 import static spark.Spark.*;
 import com.google.gson.Gson;
 
+import java.util.Arrays;
+
 public class API {
     public API(){
         get("/test", (req, res) ->
@@ -20,10 +22,26 @@ public class API {
         path("/speak", () -> {
             post("/text",
                     (req, res) -> {
-                        System.out.println(req.body());
-                        res.status(200);
-                        res.header("Content-Type", "text/json");
-                        return "Request received.";
+                        try{
+                            String paragraph = req.body();
+                            String [] parseTrees = NLPUnit.doNLP(paragraph);
+                            if(NLPUnit.isSuccess){
+                                String audioFileName = SpeechUnit.doTTS(paragraph);
+                                res.header("Content-Type", "application/json");
+                                res.status(200);
+
+                                Gson gson = new Gson();
+                                return "{\"parseTrees\":" +
+                                        gson.toJson(parseTrees) +
+                                        ",\"fileName\":\"" +
+                                        audioFileName + "\"}";
+                            }
+                            else throw new Exception("Uh-oh! Looks like there may be something wrong with your text.");
+                        }
+                        catch(Exception ex){
+                            res.status(400);
+                            return "Uh-oh! Looks like there may be something wrong with your text.";
+                        }
             });
             get("/audio",
                     (req, res) -> {
