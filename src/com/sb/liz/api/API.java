@@ -8,7 +8,8 @@ import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.io.FileInputStream;
 
 public class API {
     public API(){
@@ -53,8 +54,11 @@ public class API {
                             String fileName = req.params(":fileName") + ".wav";
                             File audio = new File("audio\\" + fileName);
                             if(!audio.exists()) throw new FileNotFoundException();
-                            res.status(200);
-                            return "File found";
+                            else{
+                                res.status(200);
+                                res.header("Content-Type", "audio/wav");
+                                return new FileInputStream(audio);
+                            }
                         }
                         catch(FileNotFoundException ex){
                             res.status(404);
